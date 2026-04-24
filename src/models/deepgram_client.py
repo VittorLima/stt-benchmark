@@ -25,7 +25,7 @@ class Deepgram:
             "smart_format": "true",
         }
 
-        logger.info("Configuração Deepgram completa")
+        logger.info("Configuração do Deepgram completa")
 
     def transcribe(self, audio_path: str) -> str:
         """Transcreve um arquivo de áudio usando o Deepgram.
