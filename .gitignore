@@ -1,0 +1,7 @@
+# Ignora tudo dentro de dataset/ (mantém o .gitkeep)
+dataset/*
+!dataset/.gitkeep
+
+__pycache__/
+.env
+.venv/
