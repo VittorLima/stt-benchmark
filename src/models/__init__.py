@@ -1,0 +1,1 @@
+""" Módulo para modelos de transcrição de áudio. """
