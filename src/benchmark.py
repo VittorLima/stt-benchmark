@@ -18,7 +18,6 @@ AUDIO_EXTENSIONS = frozenset({".wav", ".mp3", ".opus"})
 BASE_DIR = Path(__file__).parent.parent
 AUDIO_DIR = BASE_DIR / "dataset/audio"
 TRANSCRIPT_DIR = BASE_DIR / "dataset/transcripts"
-OUTPUT_DIR = BASE_DIR / "results"
 
 
 def main():
