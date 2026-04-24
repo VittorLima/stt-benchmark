@@ -3,15 +3,15 @@ import logging
 import config
 
 # Logger configurado centralmente via config.py
-logger = logging.getLogger("whisper")
+logger = logging.getLogger("FasterWhisper")
 
 
-class FASTER_WHISPER:
+class FasterWhisper:
     """Classe para transcrição de áudio usando Faster Whisper."""
 
     def __init__(self) -> None:
         try:
-            logger.info("Inicializando FASTER_WHISPER")
+            logger.info("Inicializando FasterWhisper")
 
             # Carrega o modelo Faster Whisper com as configurações especificadas
             model = WhisperModel(
@@ -23,10 +23,10 @@ class FASTER_WHISPER:
             # Habilita processamento em batch dos chunks internos de cada áudio
             self.model = BatchedInferencePipeline(model=model)
 
-            logger.info("FASTER_WHISPER carregado")
+            logger.info("FasterWhisper carregado")
 
         except Exception as exc:
-            logger.error(f"Erro ao inicializar FASTER_WHISPER: {exc}")
+            logger.error(f"Erro ao inicializar FasterWhisper: {exc}")
             raise
 
     def transcribe(self, audio_path: str) -> str:
