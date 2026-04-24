@@ -16,7 +16,7 @@ class Deepgram:
 
         self.headers = {
             "Authorization": f"Token {config.DEEPGRAM_API_KEY}",
-            "Content-Type": "audio/wav",
+            "Content-Type": "audio/*",
         }
 
         self.params = {
