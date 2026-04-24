@@ -1,6 +1,6 @@
-from faster_whisper import WhisperModel, BatchedInferencePipeline
-import logging
 import config
+import logging
+from faster_whisper import WhisperModel, BatchedInferencePipeline
 
 # Logger configurado centralmente via config.py
 logger = logging.getLogger("FasterWhisper")

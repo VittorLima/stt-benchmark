@@ -1,6 +1,6 @@
 import config
-import nemo.collections.asr as nemo_asr
 import logging
+import nemo.collections.asr as nemo_asr
 
 # Logger configurado centralmente via config.py
 logger = logging.getLogger("Parakeet")
