@@ -3,23 +3,23 @@ import logging
 import requests
 
 # Logger configurado centralmente via config.py
-logger = logging.getLogger("ElevenLabs")
+logger = logging.getLogger("Elevenlabs")
 
 
-class ElevenLabs:
-    """Classe para transcrição de áudio usando ElevenLabs Scribe v2."""
+class Elevenlabs:
+    """Classe para transcrição de áudio usando Elevenlabs Scribe v2."""
 
     def __init__(self) -> None:
-        logger.info("Configurando ElevenLabs")
+        logger.info("Configurando Elevenlabs")
 
         self.API_URL = "https://api.elevenlabs.io/v1/speech-to-text"
 
         self.headers = {"xi-api-key": config.ELEVENLABS_API_KEY}
 
-        logger.info("Configuração do ElevenLabs completa")
+        logger.info("Configuração do Elevenlabs completa")
 
     def transcribe(self, audio_path: str) -> str:
-        """Transcreve um arquivo de áudio usando o ElevenLabs Scribe v2.
+        """Transcreve um arquivo de áudio usando o Elevenlabs Scribe v2.
 
         Args:
             audio_path (str): Caminho para o arquivo de áudio a ser transcrito.

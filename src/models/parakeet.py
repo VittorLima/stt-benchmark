@@ -37,12 +37,12 @@ class Parakeet:
             logger.debug(f"Iniciando transcrição: {audio_path}")
 
             # Inferência
-            results = self.model.transcribe(audio_path)
+            results = self.model.transcribe(audio_path, verbose=False)
 
             # Extrai transcrição do resultado
             transcription = results[0].text
 
-            logger.debug(f"Transcrição concluída para {audio_path}")
+            logger.info(f"Transcrição concluída para {audio_path}")
             return transcription
 
         except Exception as exc:
