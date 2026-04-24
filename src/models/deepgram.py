@@ -10,7 +10,7 @@ class Deepgram:
     """Classe para transcrição de áudio usando Deepgram via HTTP."""
 
     def __init__(self) -> None:
-        logger.info("Inicializando Deepgram")
+        logger.info("Configurando Deepgram")
 
         self.API_URL = "https://api.deepgram.com/v1/listen"
 
@@ -25,7 +25,7 @@ class Deepgram:
             "smart_format": "true",
         }
 
-        logger.info("Configuração Deepgram carregada")
+        logger.info("Configuração Deepgram completa")
 
     def transcribe(self, audio_path: str) -> str:
         """Transcreve um arquivo de áudio usando o Deepgram.
