@@ -1,7 +1,9 @@
 """Módulo para modelos de transcrição de áudio."""
 
+MODELOS = ["Deepgram", "Elevenlabs", "Parakeet", "FasterWhisper", "Speechmatics"]
 
-# Implementação de carregamento dinâmico de modelos para evitar dependências desnecessárias
+
+# Importação dinâmica de modelos para evitar dependências desnecessárias
 def __getattr__(name):
     import importlib
 
