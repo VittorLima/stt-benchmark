@@ -1,41 +1,76 @@
-import os
-import soundfile as sf
-from datasets import load_dataset
+import config
+import logging
+from pathlib import Path
+from datasets import Audio, load_dataset
 
-os.makedirs("audio", exist_ok=True)
-os.makedirs("transcripts", exist_ok=True)
-max_samples = int(os.getenv("MAX_SAMPLES", "500"))
+# Logger configurado centralmente via config.py
+logger = logging.getLogger("LoadDataset")
 
-print("Carregando dataset...")
-ds = load_dataset(
-    "nilc-nlp/CORAA-MUPE-ASR",
-    data_files={"test": "data/test-*.parquet"},
-    split="test",
-)
 
-# Filtra qualidade alta e duração estilo WhatsApp
-ds_filtered = ds.filter(lambda x:
-    x["audio_quality"] == "high" and
-    2.0 <= x["duration"] <= 30.0
-)
-total_available = len(ds_filtered)
-print(f"Total disponível após filtros: {total_available}")
+def load_and_save_dataset(
+    audio_dir: Path, transcript_dir: Path, max_samples: int | None = None
+) -> None:
+    """Carrega o dataset CORAA-MUPE-ASR e salva áudio e transcrição por segmento.
+        Filtros aplicados:
+            - audio_quality == "high"
+            - 2.0 <= duration <= 10.0 segundos
 
-print("Salvando amostras...")
-for i, sample in enumerate(ds_filtered):
-    if i >= max_samples:
-        break
+    Args:
+        audio_dir (Path): Diretório onde os arquivos de áudio serão salvos.
+        transcript_dir (Path): Diretório onde as transcrições serão salvas.
+        max_samples (int | None): Limite de amostras a processar. None processa tudo.
+    """
+    try:
+        logger.info("Carregando dataset CORAA-MUPE-ASR do Hugging Face...")
 
-    filename = f"sample_{i:04d}"
+        # Carrega o dataset usando a biblioteca Hugging Face Datasets
+        ds = load_dataset(
+            "nilc-nlp/CORAA-MUPE-ASR",
+            data_files={"test": "data/test-*.parquet"},
+            split="test",
+            verification_mode="no_checks",
+        )
 
-    sf.write(f"audio/{filename}.wav",
-             sample["audio"]["array"],
-             sample["audio"]["sampling_rate"])
+        # Não decodifica o áudio para manter o formato original e evitar erros de leitura
+        ds = ds.cast_column("audio", Audio(decode=False))
 
-    with open(f"transcripts/{filename}.txt", "w", encoding="utf-8") as f:
-        f.write(sample["normalized_text"].strip())  # campo correto
+        # Aplica os filtros de qualidade e duração
+        ds_filtered = ds.filter(
+            lambda sample: sample["audio_quality"] == "high"
+            and 2.0 <= sample["duration"] <= 10.0
+        )
 
-    if i % 50 == 0:
-        print(f"  [{i}] {filename} ({sample['duration']:.1f}s) — {sample['birth_state']}")
+        # Processa cada amostra filtrada, salvando o áudio e a transcrição correspondente
+        saved_samples = 0  # Contador para amostras salvas
+        for idx, sample in enumerate(ds_filtered):
+            # Interrompe se atingiu o limite definido pelo chamador
+            if max_samples is not None and saved_samples >= max_samples:
+                break
 
-print(f"\n✅ Concluído!")
+            try:
+                # Extrai o áudio bruto e a transcrição normalizada
+                audio_bytes = sample["audio"]["bytes"]
+                transcript = sample["normalized_text"].strip()
+
+                # Define os caminhos de saída para o áudio e a transcrição
+                audio_path = audio_dir / f"segment_{idx}.wav"
+                transcript_path = transcript_dir / f"segment_{idx}.txt"
+
+                # Salva o áudio bruto como .wav
+                audio_path.write_bytes(audio_bytes)
+
+                # Salva a transcrição normalizada com o mesmo nome
+                transcript_path.write_text(transcript, encoding="utf-8")
+
+                saved_samples += 1
+
+            except Exception as e:
+                # Se ocorrer um erro ao processar um segmento, loga o erro e continua com o próximo
+                logger.warning(f"[segment_{idx}] Pulado: {e}")
+                continue
+
+        logger.info(f"Processamento concluído. {saved_samples} amostras salvas.")
+
+    except Exception as exc:
+        logger.error(f"Erro ao carregar e salvar o dataset: {exc}")
+        raise
