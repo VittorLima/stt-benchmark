@@ -6,4 +6,5 @@ docker run \
     --gpus all \
     --ipc=host \
     -v $(pwd):/app \
+    --env-file .env \
     stt-benchmark-imagem:latest       # nome da imagem criada por você
