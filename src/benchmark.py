@@ -52,9 +52,10 @@ def main() -> None:
 
     # Lista arquivos de áudio no diretório
     audio_files = list(AUDIO_DIR.glob("*.wav"))
-    logger.info(
-        f"Encontrados {len(audio_files)} arquivos de áudio no diretório {AUDIO_DIR}"
-    )
+
+    # Aplica limite de amostras também no processamento
+    if args.samples is not None:
+        audio_files = audio_files[: args.samples]
 
     # Variáveis para armazenar estatísticas de WER, CER e tempo de inferência
     wers, cers, inference_times = [], [], []

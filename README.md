@@ -32,7 +32,7 @@ Dentro do container:
 python3 src/benchmark.py --model FasterWhisper
 ```
  
-Para limitar a quantidade de amostras baixadas, use `--samples`:
+Para limitar a quantidade de amostras processadas (e baixadas, se necessário), use `--samples`:
  
 ```bash
 python3 src/benchmark.py --model FasterWhisper --samples 100
@@ -58,7 +58,10 @@ O benchmark usa o dataset CORAA-MUPE-ASR de fala espontânea em português brasi
 
 **Comportamento do download:**
 - **Sem `--samples`**: baixa todas as ~17.854 amostras filtradas.
-- **Com `--samples N`**: baixa apenas `N` amostras. Se já houver `≥ N` arquivos locais, pula o download.
+- **Com `--samples N`**:
+  - Baixa apenas `N` amostras (se necessário)
+  - Se já houver `≥ N` arquivos locais, pula o download
+  - O benchmark processa apenas `N` amostras (mesmo que existam mais no diretório)
 
 ### Usar dataset próprio
  
