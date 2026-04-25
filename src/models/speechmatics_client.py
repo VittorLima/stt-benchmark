@@ -46,7 +46,7 @@ class Speechmatics:
             logger.debug(f"Iniciando transcrição: {audio_path}")
 
             # Cria cliente WebSocket para comunicação com o Speechmatics
-            self.client = speechmatics.client.WebsocketClient(settings)
+            self.client = speechmatics.client.WebsocketClient(self.settings)
 
             transcripts = []
 
