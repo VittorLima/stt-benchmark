@@ -1,12 +1,13 @@
 """Módulo para modelos de transcrição de áudio."""
 
+from typing import Any
+import importlib
+
 MODELOS = ["Deepgram", "Elevenlabs", "Parakeet", "FasterWhisper", "Speechmatics"]
 
 
 # Importação dinâmica de modelos para evitar dependências desnecessárias
-def __getattr__(name):
-    import importlib
-
+def __getattr__(name: str) -> Any:
     # Mapeamento de nomes de modelos para seus módulos e classes correspondentes
     _map = {
         "Deepgram": (".deepgram_client", "Deepgram"),
