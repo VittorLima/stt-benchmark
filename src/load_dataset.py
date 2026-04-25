@@ -8,7 +8,7 @@ logger = logging.getLogger("LoadDataset")
 
 
 def load_and_save_dataset(
-    audio_dir: Path, transcript_dir: Path, max_samples: int | None = None
+    audio_dir: Path, transcript_dir: Path, samples: int | None = None
 ) -> None:
     """Carrega o dataset CORAA-MUPE-ASR e salva áudio e transcrição por segmento.
         Filtros aplicados:
@@ -18,7 +18,7 @@ def load_and_save_dataset(
     Args:
         audio_dir (Path): Diretório onde os arquivos de áudio serão salvos.
         transcript_dir (Path): Diretório onde as transcrições serão salvas.
-        max_samples (int | None): Limite de amostras a processar. None processa tudo.
+        samples (int | None): Limite de amostras a processar. None processa tudo.
     """
     try:
         logger.info("Carregando dataset CORAA-MUPE-ASR do Hugging Face...")
@@ -44,7 +44,7 @@ def load_and_save_dataset(
         saved_samples = 0  # Contador para amostras salvas
         for idx, sample in enumerate(ds_filtered):
             # Interrompe se atingiu o limite definido pelo chamador
-            if max_samples is not None and saved_samples >= max_samples:
+            if samples is not None and saved_samples >= samples:
                 break
 
             try:
@@ -56,11 +56,13 @@ def load_and_save_dataset(
                 audio_path = audio_dir / f"segment_{idx}.wav"
                 transcript_path = transcript_dir / f"segment_{idx}.txt"
 
-                # Salva o áudio bruto como .wav
-                audio_path.write_bytes(audio_bytes)
+                # Salva o áudio bruto como .wav (pula se já existir)
+                if not audio_path.exists():
+                    audio_path.write_bytes(audio_bytes)
 
-                # Salva a transcrição normalizada com o mesmo nome
-                transcript_path.write_text(transcript, encoding="utf-8")
+                # Salva a transcrição normalizada com o mesmo nome (pula se já existir)
+                if not transcript_path.exists():
+                    transcript_path.write_text(transcript, encoding="utf-8")
 
                 saved_samples += 1
 
