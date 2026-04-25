@@ -48,10 +48,17 @@ INFO - Benchmark - Processados: 95/100 arquivos (5 pulados) — WER: 15.20%, CER
  
 ## 3) Dataset
  
-- O benchmark usa arquivos em `dataset/audio/*.wav` e `dataset/transcripts/*.txt`
-- **Sem `--samples`**: o script baixa o dataset público automaticamente do Hugging Face (`nilc-nlp/CORAA-MUPE-ASR`, um corpus de português brasileiro) e salva em `dataset/`.
+### CORAA-MUPE-ASR (padrão)
+ 
+O benchmark usa o dataset CORAA-MUPE-ASR de fala espontânea em português brasileiro, publicado no Hugging Face:
+ 
+- **Total de amostras** (split de teste): ~30.968
+- **Após filtros** (`audio_quality=high` + duração 2–10s): ~17.854 amostras
+- **Formato**: arquivos em `dataset/audio/*.wav` e `dataset/transcripts/*.txt`
+
+**Comportamento do download:**
+- **Sem `--samples`**: baixa todas as ~17.854 amostras filtradas.
 - **Com `--samples N`**: baixa apenas `N` amostras. Se já houver `≥ N` arquivos locais, pula o download.
-- Filtros no download: `audio_quality=high` e duração entre 2 e 10 segundos.
 
 ### Usar dataset próprio
  
