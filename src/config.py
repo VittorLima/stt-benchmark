@@ -3,6 +3,7 @@ import sys
 import re
 import logging
 from pathlib import Path
+from typing import TextIO
 from dotenv import load_dotenv
 
 
@@ -12,24 +13,25 @@ from dotenv import load_dotenv
 class _NeMoFilter:
     _pattern = re.compile(r"^\[NeMo\s")
 
-    def __init__(self, stream):
+    def __init__(self, stream: TextIO) -> None:
         self._stream = stream
 
-    def write(self, msg):
+    def write(self, msg: str) -> int:
         if not self._pattern.match(msg):
-            self._stream.write(msg)
+            return self._stream.write(msg)
+        return 0
 
-    def flush(self):
+    def flush(self) -> None:
         self._stream.flush()
 
-    def isatty(self):
+    def isatty(self) -> bool:
         return self._stream.isatty()
 
-    def fileno(self):
+    def fileno(self) -> int:
         return self._stream.fileno()
 
     @property
-    def encoding(self):
+    def encoding(self) -> str:
         return getattr(self._stream, "encoding", "utf-8")
 
 
