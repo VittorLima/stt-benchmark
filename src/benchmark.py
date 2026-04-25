@@ -58,6 +58,7 @@ def main() -> None:
 
     # Variáveis para armazenar estatísticas de WER, CER e tempo de inferência
     wers, cers, inference_times = [], [], []
+    skipped = 0  # Contador de arquivos pulados devido a erros
 
     # Processa cada arquivo de áudio
     for audio_file in tqdm(audio_files, desc="Processando áudio"):
@@ -67,7 +68,12 @@ def main() -> None:
 
         # Realiza a transcrição usando o modelo e mede o tempo de inferência
         start = time.perf_counter()
-        hypothesis = model.transcribe(str(audio_file))
+        try:
+            hypothesis = model.transcribe(str(audio_file))
+        except Exception as exc:
+            logger.warning(f"Transcrição falhou para {audio_file.name}, pulando: {exc}")
+            skipped += 1
+            continue
         inference_time = time.perf_counter() - start
 
         # Normalizador comum para referência e hipótese para garantir comparação justa
@@ -91,11 +97,12 @@ def main() -> None:
         return
 
     # Calcula estatísticas agregadas e exibe resultados
-    avg_wer = np.mean(wers)
-    avg_cer = np.mean(cers)
-    avg_inference_time = np.mean(inference_times)
     logger.info(
-        f"Resultados agregados - WER: {avg_wer:.2%}, CER: {avg_cer:.2%}, Tempo de inferência: {avg_inference_time:.2f}s"
+        f"Processados: {len(wers)}/{len(audio_files)} arquivos "
+        f"({skipped} pulados) — "
+        f"WER: {np.mean(wers):.2%}, "
+        f"CER: {np.mean(cers):.2%}, "
+        f"Tempo de inferência: {np.mean(inference_times):.2f}s"
     )
 
 

@@ -52,6 +52,13 @@ def load_and_save_dataset(
                 audio_bytes = sample["audio"]["bytes"]
                 transcript = sample["normalized_text"].strip()
 
+                # Pula se áudio ou transcrição estiverem vazios
+                if not audio_bytes or not transcript:
+                    logger.warning(
+                        f"[segment_{idx}] Áudio ou transcrição vazio, pulando."
+                    )
+                    continue
+
                 # Define os caminhos de saída para o áudio e a transcrição
                 audio_path = audio_dir / f"segment_{idx}.wav"
                 transcript_path = transcript_dir / f"segment_{idx}.txt"
