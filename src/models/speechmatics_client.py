@@ -17,14 +17,11 @@ class Speechmatics:
     def __init__(self) -> None:
         logger.info("Configurando Speechmatics")
 
-        # Configurações de conexão e transcrição para o Speechmatics
-        settings = ConnectionSettings(
+        # Configurações de conexão — stateless, definidas uma única vez
+        self.settings = ConnectionSettings(
             url="wss://eu.rt.speechmatics.com/v2",
             auth_token=config.SPEECHMATICS_API_KEY,
         )
-
-        # Cria cliente WebSocket para comunicação com o Speechmatics
-        self.client = speechmatics.client.WebsocketClient(settings)
 
         # Configurações de transcrição
         self.transcription_config = TranscriptionConfig(
@@ -47,6 +44,9 @@ class Speechmatics:
         """
         try:
             logger.debug(f"Iniciando transcrição: {audio_path}")
+
+            # Cria cliente WebSocket para comunicação com o Speechmatics
+            self.client = speechmatics.client.WebsocketClient(settings)
 
             transcripts = []
 
