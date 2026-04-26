@@ -7,6 +7,7 @@ import numpy as np
 import time
 import jiwer
 import models
+from utils import numbers_to_words
 from load_dataset import load_and_save_dataset
 
 # Logger configurado centralmente via config.py
@@ -70,7 +71,8 @@ def main() -> None:
         # Realiza a transcrição usando o modelo e mede o tempo de inferência
         start = time.perf_counter()
         try:
-            hypothesis = model.transcribe(str(audio_file))
+            transcription = model.transcribe(str(audio_file))
+            hypothesis = numbers_to_words(transcription)
         except Exception as exc:
             logger.warning(f"Transcrição falhou para {audio_file.name}, pulando: {exc}")
             skipped += 1
