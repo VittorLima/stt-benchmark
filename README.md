@@ -53,7 +53,7 @@ INFO - Benchmark - Processados: 95/100 arquivos (5 pulados) — WER: 15.20%, CER
 O benchmark usa o dataset CORAA-MUPE-ASR de fala espontânea em português brasileiro, publicado no Hugging Face:
  
 - **Total de amostras** (split de teste): ~30.968
-- **Após filtros** (`audio_quality=high` + duração 2–10s): ~17.854 amostras
+- **Após filtros** (`audio_quality=high` + duração 5–20s): ~17.854 amostras
 - **Formato**: arquivos em `dataset/audio/*.wav` e `dataset/transcripts/*.txt`
 
 **Comportamento do download:**
