@@ -40,6 +40,9 @@ def load_and_save_dataset(
             and 2.0 <= sample["duration"] <= 10.0
         )
 
+        # Randomiza a ordem das amostras filtradas
+        ds_filtered = ds_filtered.shuffle(seed=42)
+
         # Processa cada amostra filtrada, salvando o áudio e a transcrição correspondente
         saved_samples = 0  # Contador para amostras salvas
         for idx, sample in enumerate(ds_filtered):
