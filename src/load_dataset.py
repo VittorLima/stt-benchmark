@@ -13,7 +13,7 @@ def load_and_save_dataset(
     """Carrega o dataset CORAA-MUPE-ASR e salva áudio e transcrição por segmento.
         Filtros aplicados:
             - audio_quality == "high"
-            - 2.0 <= duration <= 10.0 segundos
+            - 5.0 <= duration <= 20.0 segundos
 
     Args:
         audio_dir (Path): Diretório onde os arquivos de áudio serão salvos.
@@ -37,7 +37,7 @@ def load_and_save_dataset(
         # Aplica os filtros de qualidade e duração
         ds_filtered = ds.filter(
             lambda sample: sample["audio_quality"] == "high"
-            and 2.0 <= sample["duration"] <= 10.0
+            and 5.0 <= sample["duration"] <= 20.0
         )
 
         # Randomiza a ordem das amostras filtradas
