@@ -9,7 +9,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 
 
-# Instala dependências do sistema
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         python3 \
@@ -24,20 +23,22 @@ RUN apt-get update && \
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Copia o arquivo de requisitos 
-COPY requirements.txt .
-
-# Instala as dependências do Python (incluindo PyTorch com suporte CUDA)
+# Instala PyTorch com suporte CUDA
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir \
-        --index-url https://download.pytorch.org/whl/cu121 \
-        torch==2.5.1+cu121 \
-        torchaudio==2.5.1+cu121 && \
-    pip install --no-cache-dir -r requirements.txt && \
-    rm -rf /root/.cache/pip /tmp/*
+        torch==2.8.0+cu128 \
+        torchaudio==2.8.0+cu128 \
+        torchvision==0.23.0+cu128 \
+        --extra-index-url https://download.pytorch.org/whl/cu128
+
+# Copia o arquivo de requisitos
+COPY requirements.txt .
+
+# Instala as dependências do projeto
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia o código fonte da aplicação
 COPY src/ ./src/
 
-# Define o comando de entrada para o container
+# Define o comando padrão para iniciar a aplicação
 CMD ["/bin/bash"]

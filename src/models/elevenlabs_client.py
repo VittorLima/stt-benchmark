@@ -1,8 +1,9 @@
-import config
 import logging
+
 import requests
 
-# Logger configurado centralmente via config.py
+from config import settings
+
 logger = logging.getLogger("Elevenlabs")
 
 
@@ -14,7 +15,7 @@ class Elevenlabs:
 
         self.API_URL = "https://api.elevenlabs.io/v1/speech-to-text"
 
-        self.headers = {"xi-api-key": config.ELEVENLABS_API_KEY}
+        self.headers = {"xi-api-key": settings.elevenlabs_api_key}
 
         logger.info("Configuração do Elevenlabs completa")
 
@@ -30,7 +31,6 @@ class Elevenlabs:
         try:
             logger.debug(f"Iniciando transcrição: {audio_path}")
 
-            # Envia o arquivo de áudio para a API do ElevenLabs
             with open(audio_path, "rb") as f:
                 response = requests.post(
                     self.API_URL,
@@ -42,10 +42,8 @@ class Elevenlabs:
                     },
                 )
 
-            # Verifica se a resposta foi bem-sucedida
             response.raise_for_status()
 
-            # Extrai transcrição do resultado
             transcription = response.json()["text"]
 
             logger.debug(f"Transcrição concluída para {audio_path}")

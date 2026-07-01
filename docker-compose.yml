@@ -1,0 +1,13 @@
+services:
+  stt-benchmark:
+    image: stt-benchmark-imagem:latest
+    container_name: stt-benchmark
+    gpus: all
+    ipc: host
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+    env_file:
+      - path: ./.env
+        required: false

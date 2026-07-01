@@ -1,30 +1,29 @@
-import config
-import logging
 import argparse
-from pathlib import Path
-from tqdm import tqdm
-import numpy as np
+import logging
 import time
+from pathlib import Path
+
 import jiwer
+import numpy as np
+from tqdm import tqdm
+
+import logging_config  # noqa: F401  (configura logging/filtro NeMo ao ser importado)
 import models
-from utils import numbers_to_words
 from load_dataset import load_and_save_dataset
+from utils import numbers_to_words
 
-# Logger configurado centralmente via config.py
-logger = logging.getLogger("Benchmark")
+# Logger central
+logger = logging.getLogger(__name__)
 
-# Diretórios de entrada e saída
 BASE_DIR = Path(__file__).parent.parent
 AUDIO_DIR = BASE_DIR / "dataset/audio"
 TRANSCRIPT_DIR = BASE_DIR / "dataset/transcripts"
 
-# Cria diretórios de saída se não existirem
 AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 TRANSCRIPT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def main() -> None:
-    # Configura o parser de argumentos para escolher o modelo e limitar amostras
     parser = argparse.ArgumentParser(
         description="Benchmark de modelos STT.",
     )
@@ -37,7 +36,6 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Baixa o dataset apenas se não houver amostras suficientes localmente
     existing_samples = len(list(AUDIO_DIR.glob("*.wav")))
     if existing_samples < (args.samples or float("inf")):
         logger.info(
@@ -47,28 +45,20 @@ def main() -> None:
     else:
         logger.info(f"{existing_samples} amostras já disponíveis, pulando download.")
 
-    # Obtém a classe do modelo selecionado dinamicamente e instancia o modelo
     model_class = getattr(models, args.model)
     model = model_class()
 
-    # Lista arquivos de áudio no diretório
     audio_files = list(AUDIO_DIR.glob("*.wav"))
-
-    # Aplica limite de amostras também no processamento
     if args.samples is not None:
         audio_files = audio_files[: args.samples]
 
-    # Variáveis para armazenar estatísticas de WER, CER e tempo de inferência
     wers, cers, inference_times = [], [], []
-    skipped = 0  # Contador de arquivos pulados devido a erros
+    skipped = 0
 
-    # Processa cada arquivo de áudio
     for audio_file in tqdm(audio_files, desc="Processando áudio"):
-        # Lê o arquivo de referência correspondente à transcrição
         ref_path = TRANSCRIPT_DIR / f"{audio_file.stem}.txt"
         reference = ref_path.read_text(encoding="utf-8").strip()
 
-        # Realiza a transcrição usando o modelo e mede o tempo de inferência
         start = time.perf_counter()
         try:
             transcription = model.transcribe(str(audio_file))
@@ -79,18 +69,13 @@ def main() -> None:
             continue
         inference_time = time.perf_counter() - start
 
-        # Normalizador comum para referência e hipótese para garantir comparação justa
         normalizer = jiwer.Compose([jiwer.RemovePunctuation(), jiwer.ToLowerCase()])
-
-        # Normaliza a hipótese e a referência antes de calcular WER e CER
         hypothesis = normalizer(hypothesis)
         reference = normalizer(reference)
 
-        # Calcula WER e CER usando jiwer
         wer = jiwer.wer(reference, hypothesis)
         cer = jiwer.cer(reference, hypothesis)
 
-        # Atualiza estatísticas
         wers.append(wer)
         cers.append(cer)
         inference_times.append(inference_time)
@@ -99,7 +84,6 @@ def main() -> None:
         logger.warning("Nenhum arquivo processado.")
         return
 
-    # Calcula estatísticas agregadas e exibe resultados
     logger.info(
         f"Processados: {len(wers)}/{len(audio_files)} arquivos "
         f"({skipped} pulados) — "

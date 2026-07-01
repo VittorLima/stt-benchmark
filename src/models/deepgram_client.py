@@ -1,8 +1,9 @@
-import config
 import logging
+
 import requests
 
-# Logger configurado centralmente via config.py
+from config import settings
+
 logger = logging.getLogger("Deepgram")
 
 
@@ -15,7 +16,7 @@ class Deepgram:
         self.API_URL = "https://api.deepgram.com/v1/listen"
 
         self.headers = {
-            "Authorization": f"Token {config.DEEPGRAM_API_KEY}",
+            "Authorization": f"Token {settings.deepgram_api_key}",
             "Content-Type": "audio/*",
         }
 
@@ -39,7 +40,6 @@ class Deepgram:
         try:
             logger.debug(f"Iniciando transcrição: {audio_path}")
 
-            # Envia o arquivo de áudio para a API do Deepgram
             with open(audio_path, "rb") as f:
                 response = requests.post(
                     self.API_URL,
@@ -48,10 +48,8 @@ class Deepgram:
                     data=f,
                 )
 
-            # Verifica se a resposta foi bem-sucedida
             response.raise_for_status()
 
-            # Extrai transcrição do resultado
             data = response.json()["results"]["channels"][0]["alternatives"][0]
             transcription = data["transcript"]
 

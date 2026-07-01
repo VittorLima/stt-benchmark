@@ -4,6 +4,3 @@ dataset/*
 
 __pycache__/
 .env
-.venv/
-*.wav
-*.txt

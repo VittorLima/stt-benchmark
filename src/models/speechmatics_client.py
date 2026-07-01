@@ -1,13 +1,14 @@
-import config
 import logging
+
 import speechmatics
 from speechmatics.models import (
     ConnectionSettings,
-    TranscriptionConfig,
     ServerMessageType,
+    TranscriptionConfig,
 )
 
-# Logger configurado centralmente via config.py
+from config import settings
+
 logger = logging.getLogger("Speechmatics")
 
 
@@ -20,10 +21,9 @@ class Speechmatics:
         # Configurações de conexão — stateless, definidas uma única vez
         self.settings = ConnectionSettings(
             url="wss://eu.rt.speechmatics.com/v2",
-            auth_token=config.SPEECHMATICS_API_KEY,
+            auth_token=settings.speechmatics_api_key,
         )
 
-        # Configurações de transcrição
         self.transcription_config = TranscriptionConfig(
             language="pt",
             operating_point="enhanced",
@@ -45,12 +45,10 @@ class Speechmatics:
         try:
             logger.debug(f"Iniciando transcrição: {audio_path}")
 
-            # Cria cliente WebSocket para comunicação com o Speechmatics
             self.client = speechmatics.client.WebsocketClient(self.settings)
 
             transcripts = []
 
-            # Registra um handler para capturar os segmentos de transcrição à medida que são recebidos
             self.client.add_event_handler(
                 event_name=ServerMessageType.AddTranscript,
                 event_handler=lambda msg: transcripts.append(
@@ -58,11 +56,9 @@ class Speechmatics:
                 ),
             )
 
-            # Envia o arquivo de áudio para o Speechmatics e aguarda a transcrição completa
             with open(audio_path, "rb") as f:
                 self.client.run_synchronously(f, self.transcription_config)
 
-            # Concatena os segmentos transcritos em uma única string
             transcription = " ".join(transcripts).strip()
 
             logger.debug(f"Transcrição concluída para {audio_path}")
